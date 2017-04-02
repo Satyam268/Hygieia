@@ -4,11 +4,11 @@
 var mysql = require("mysql");
 
 var con = mysql.createConnection({
-    host: "localhost",
-    port: "",
-    user: "",
+    host: "192.168.0.26",
+    port: "3306",
+    user: "Any",
     password: "",
-    database: ""
+    database: "hygieia"
 });
 
 con.connect(function(err){
@@ -18,7 +18,7 @@ con.connect(function(err){
     } console.log('Connection established');
 });
 
-var sql = con.query('call sp(?, ?, ?)', [accountTest.email, accountTest.password, accountTest.bit], function(err, result) {
+var sql = con.query('call sp_test()', function(err, result) {
     if (err) throw err;
     console.log(result.insertId);
 });
