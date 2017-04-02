@@ -21,7 +21,6 @@ connection.connect(function (error) {
     else{
         console.log('connection established');
     }
-
 });
 
 helpers.scheduleAppointment =  function(error,schData,res) {
