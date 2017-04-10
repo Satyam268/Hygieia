@@ -5,7 +5,10 @@ var http=require('http');
 var patientData= require('../models/patient.js');
 var schedData= require('../models/scheduleAppointment.js');
 var prescriptionData= require('../models/updatePrescription.js');
+var util = require('util');
 /* GET home page. */
+var schData = require('../models/scheduleAppointment.js');
+
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
@@ -14,17 +17,48 @@ router.get('/', function(req, res, next) {
 router.get('/register', function(req, res, next){
     console.log('inside register');
     //  take data from http head how to get and parse data from post
-    console.log('req query: '+req.query);
-    //console.log('req params: '+req.params.pname);
-    console.log('req body: '+req.body);
     var patient=patientData.patient_model(req.query.pname,req.query.dob,req.query.address,req.query.policy_number);
-    db_helper.addPatient(patient,res);
+    db_helper.registerPatient(patient,res);
+
 });
 
-router.post('/scheduleAppointment', function (req,res,next) {
-  console.log(res.query);
-  db_helper.scheduleAppointment(req.query,res);
+router.get('/getDoctorList', function (req,res) {
+    console.log('inside get doc list');
+    db_helper.getDoctorList(res);
 });
+
+router.get('/scheduleAppointment', function (req,res) {
+ console.log("check in query"+ req);
+ // SEND AVI APP_ID WHEN HE SCHEDULES AN APPOINTMENT AND
+    //
+  console.log("in scheudle Appointment "+req.query.patientID +" "+req.query.docID +" "+req.query.appointmentST +" "+ "endddd");
+  var dataschedule= {
+      patientID:req.query.patientID,
+      docID:req.query.docID,
+      appointmentST:req.query.appointmentST,
+       appointmentET:''
+  }
+  db_helper.scheduleAppointment(dataschedule,res);
+});
+
+router.get('/getCurrentAppointments',function(req,res){
+    console.log('gives appointments for patient'+ req);
+    db_helper.getCurrentAppointements(req.query.patientID,res);
+});
+
+
+router.get('/getPastAppointments',function(req,res){
+    console.log('gives appointments for patient'+ req);
+    db_helper.getPastAppointements(req.query.patientID,res);
+});
+
+
+router.get('/getAvailablility', function (req,res) {
+    console.log('inside get availability');
+    db_helper.getAvailibility(req.query.docID,res);
+});
+
+
 
 router.get('/enterDoctorRoom', function (req,res,next) {
   console.log(res.query);
@@ -34,7 +68,7 @@ router.get('/enterDoctorRoom', function (req,res,next) {
 
 router.get('/exitDoctorRoom', function (req,res,next) {
     console.log(res.query);
-    db_helper.exitDoctorRoom(req.query.docID,req.query.patientID,res);
+    db_helper.exitDoctorRoom(req.query.docID,req.query.patientID,req.query.appID ,res);
 });
 
 router.get('/getExpectedWaitingTime', function (req,res,next) {
@@ -42,28 +76,51 @@ router.get('/getExpectedWaitingTime', function (req,res,next) {
     db_helper.getExpectedWaitingTime(req.query.policyno,res);
 });
 
-router.post('/savePrescription', function (req,res,next) {
+router.get('/savePrescription', function (req,res,next) {
   console.log('inside save prescription');
   var prescription = prescriptionData.updatePrescription_model(req.query.policyno,req.query.med,req.query.exercise);
   db_helper.savePrescription(prescription,res);
 });
 
-router.get('/getPrescription', function (req,res,next) {
+router.get('/getPrescription', function (req,res) {
     console.log('inside get doc list');
     db_helper.getPrescription(req.query.policyno,res);
 });
 
 
-router.get('/getDoctorList', function (req,res,next) {
-  console.log('inside get doc list');
-  db_helper.getDoctorList(res);
+
+
+router.get('/getPatientDetails',function(req,res){
+    console.log('gives appointments for patient'+ req);
+   // db_helper.getPatientDetails(req.query.patientID,res);
+    var output = {
+        "name" : "aman",
+        "age" : "25",
+        "dob" : "25 March 1991"
+    }
+    res.send(output);
 });
 
 
-router.get('/getAvailablility', function (req,res,next) {
-    console.log('inside get availability');
-    db_helper.getAppointement(req.query.docID,res);
+router.get('/getPatientMedicineHistory',function(req,res){
+    console.log('gives appointments for patient'+ req);
+    db_helper.getPatientMedicineHistory(req.query.patientID,res);
 });
 
+router.get('/getPatientExerciseHistory',function(req,res){
+    console.log('gives appointments for patient'+ req);
+    db_helper.getPatientExerciseHistory(req.query.patientID,res);
+});
+
+router.get('/saveMedicinePrescription',function (req,res) {
+    console.log('enters patients medicinal data');
+    db_helper.postMedicinePrescription();
+});
+
+
+router.get('/saveExercisePrescription',function (req,res) {
+    console.log('enters patients exercise data');
+    db_helper.postExercisePrescription();
+});
 
 module.exports = router;
