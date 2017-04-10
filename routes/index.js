@@ -123,4 +123,14 @@ router.get('/saveExercisePrescription',function (req,res) {
     db_helper.postExercisePrescription();
 });
 
+router.get('/getExerciseList',function (req,res) {
+    console.log('enters patients exercise data');
+    db_helper.getExerciseList(res);
+});
+
+router.get('/getMedicineList',function (req,res) {
+    console.log('enters patients exercise data');
+    db_helper.getMedicineList(res);
+});
+
 module.exports = router;

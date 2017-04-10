@@ -314,4 +314,52 @@ helpers.addPrescription = function (req,res) {
         }
     });
 }
+
+helpers.getMedicineList = function (res) {
+    // req has pre: patientID medicine(name and timings), exercise,
+    connection.query('call sp_get_medicine_list()',function (error,rows,fields) {
+        //callback
+        if(!!error){
+            console.log('error from db'+error);
+            res.send({response: '-1'});
+        }
+        else{
+            // console.log(fields);
+            console.log('query successful');
+            if(rows!=null) {
+                console.log(rows[0]);
+            }
+            else{
+                console.log(rows[0]);
+            }
+            console.log("in medicine list "+ res);
+            res.send(rows[0]);
+        }
+    });
+}
+
+
+helpers.getExerciseList = function (res) {
+    // req has pre: patientID medicine(name and timings), exercise,
+    connection.query('call sp_get_exercise_list()',function (error,rows) {
+        //callback
+        if(!!error){
+            console.log('error from db'+error);
+            res.send({response: '-1'});
+        }
+        else{
+            // console.log(fields);
+            console.log('query successful');
+            if(rows!=null) {
+                console.log(rows[0]);
+            }
+            else{
+                console.log(rows[0]);
+            }
+            res.send(rows[0]);
+        }
+    });
+}
+
+
 module.exports = helpers;
