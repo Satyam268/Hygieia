@@ -30,7 +30,7 @@ router.post('/register', function(req, res, next){
 
 router.get('/getDoctorList', function (req,res) {
     console.log('inside get doc list');
-    if(req.query.patientID !== null){
+    if(req.query.patientID != null){
         db_helper.getDoctorList_filtered(res, req.query.patientID);
     }
     else{
@@ -186,9 +186,13 @@ router.get('/getMedicineList',function (req,res) {
 router.post('/postedFromAlexa',function (req,res) {
     console.log('enters patients exercise data');
     // object, symptoms key value same, one key with patient ID:
-    console.log("check in query"+ req+ "object keys "+ Object.keys(req.body)+"  ");
-    console.log("req.body.symptoms:     "+req.body.symptoms);
+    console.log("check in query"+ req+ "object keys "+ JSON.stringify(Object.keys(req.body))+"  ");
+   // console.log("req.body.symptoms:     "+req.body.symptoms);
+    console.log();
+    console.log("req.body.symptoms:" + JSON.stringify(req.body.symptoms));
+    console.log("req.body.patientID:" + JSON.stringify(req.body.patientID));
 
+   // var input = req.body.event.request.intent.slots.Symptom;
     var data = JSON.parse(req.body.symptoms);
     var len = data.length;
     var symptomsData = Object.keys(data);
