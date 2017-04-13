@@ -491,9 +491,9 @@ helpers.getPatientExerciseHistory = function (patientID,res) {
         });
 }
 
-helpers.postedFromAlexa = function (symptomData,patientID,res) {
+helpers.postedFromAlexa = function (patientID,symptomData,res) {
 
-    connection.query('call sp_postedFromAlexa('+patientID+','+symptomData+')',function (error,rows) {
+    connection.query('call sp_postedFromAlexa(?,?)',[patientID, symptomData],function (error,rows) {
         //callback
         if(!!error){
             console.log('error from db'+error);

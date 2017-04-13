@@ -193,25 +193,15 @@ router.post('/postedFromAlexa',function (req,res) {
     console.log(sym);
     console.log("req.body.symptoms:" + JSON.stringify(req.body.symptoms));
     console.log("req.body.patientID:" + JSON.stringify(req.body.patientID));
-    //var str = {"fever":"fever","backpain":"backpain"};
 
-   // var input = req.body.event.request.intent.slots.Symptom;
-    //var data = JSON.parse(req.body.symptoms);
-    //var len = data.length;
     var symptomsData = Object.keys(sym);
     data = '';
     for(var i=0;i<symptomsData.length;i++)
-        data+= symptomsData[i]+",";
+        data+= symptomsData[i]+"";
 
-   /* Object.keys(req.body['symptoms']).forEach(entry){
-        symptomsData += entry+" ";
-    };*/
     console.log("symptoms: "+data+" "+ "patientID: "+ req.body.patientID);
     db_helper.postedFromAlexa(req.body.patientID,data,res);
 });
-
-
-
 
 /*
 router.get('/getPrescription', function (req,res) {
@@ -219,5 +209,6 @@ router.get('/getPrescription', function (req,res) {
     db_helper.getPrescription(req.query.policyno,res);
 });
 */
+
 
 module.exports = router;
