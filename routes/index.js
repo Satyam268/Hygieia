@@ -48,6 +48,18 @@ router.get('/getAlexaStatus', function (req,res) {
     console.log("patient id for alexa status"+param);
 });
 
+router.get('/getDelay', function (req,res) {
+    console.log('inside get delay');
+    db_helper.getDelay(req.query.docID,req.query.patientID,req.query.AppointmentST,res);
+});
+
+router.get('/resetDataChanged', function (req,res) {
+    console.log('inside get  reset Data Changed');
+    db_helper.resetDataChanged(req.query.docID,req.query.patientID,req.query.AppointmentST,res);
+});
+
+
+
 router.get('/getAvailability', function (req,res) {
     console.log('inside get availability');
     db_helper.getAvailibility(req.query.docID,res);
@@ -102,7 +114,8 @@ router.get('/getExpectedWaitingTime', function (req,res,next) {
 
 router.post('/postMedicinePrescription', function (req,res) {
   console.log('inside save prescription');
-    console.log("check in query"+ req+ "obejct keys "+ Object.keys(req.body)+"  ");
+    var data = req.body.data;
+    console.log("check in query"+ req+ "object keys "+ Object.keys(req.body)+"  ");
     var data='';
     Object.keys(req.body).forEach(function (element) {
         data.append("( "+element['Medicine Name']+" "+element['Timings']+" ),");
@@ -123,22 +136,6 @@ router.post('/postExercisePrescription', function (req,res) {
     // doctorID=1 and patient appointmentID= 1
     db_helper.postExercisePrescription(data,res);
 });
-
-/*
-
-router.get('/getPrescription', function (req,res) {
-    console.log('inside get doc list');
-    db_helper.getPrescription(req.query.policyno,res);
-});
-*/
-
-
-
-router.get('/getPrescription', function (req,res) {
-    console.log('inside get doc list');
-    db_helper.getPrescription(req.query.policyno,res);
-});
-
 
 
 
@@ -161,10 +158,13 @@ router.get('/getPatientExerciseHistory',function(req,res){
     db_helper.getPatientExerciseHistory(req.query.patientID,res);
 });
 
+/*
 router.get('/saveMedicinePrescription',function (req,res) {
+   // var data = req.body.data;
     console.log('enters patients medicinal data'+ req);
     db_helper.postMedicinePrescription();
 });
+*/
 
 
 router.get('/postExercisePrescription',function (req,res) {
@@ -189,13 +189,16 @@ router.post('/postedFromAlexa',function (req,res) {
     console.log("check in query"+ req+ "object keys "+ JSON.stringify(Object.keys(req.body))+"  ");
    // console.log("req.body.symptoms:     "+req.body.symptoms);
     console.log();
+    var sym = req.body.symptoms;
+    console.log(sym);
     console.log("req.body.symptoms:" + JSON.stringify(req.body.symptoms));
     console.log("req.body.patientID:" + JSON.stringify(req.body.patientID));
+    //var str = {"fever":"fever","backpain":"backpain"};
 
    // var input = req.body.event.request.intent.slots.Symptom;
-    var data = JSON.parse(req.body.symptoms);
-    var len = data.length;
-    var symptomsData = Object.keys(data);
+    //var data = JSON.parse(req.body.symptoms);
+    //var len = data.length;
+    var symptomsData = Object.keys(sym);
     data = '';
     for(var i=0;i<symptomsData.length;i++)
         data+= symptomsData[i]+",";
@@ -206,5 +209,15 @@ router.post('/postedFromAlexa',function (req,res) {
     console.log("symptoms: "+data+" "+ "patientID: "+ req.body.patientID);
     db_helper.postedFromAlexa(req.body.patientID,data,res);
 });
+
+
+
+
+/*
+router.get('/getPrescription', function (req,res) {
+    console.log('inside get doc list');
+    db_helper.getPrescription(req.query.policyno,res);
+});
+*/
 
 module.exports = router;

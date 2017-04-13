@@ -37,6 +37,52 @@ helpers.registerPatient = function(patient,res){
     });
 }
 
+helpers.resetDataChanged = function (docID,patientID,appointmentST,res) {
+    connection.query('call sp_ack_change_received(?,?,?)',[docID,patientID,appointmentST],function (error,rows) {
+        //callback
+        if(!!error){
+            console.log('error from db'+error);
+
+            res.send('-1');
+        }
+        else{
+            // console.log(fields);
+            console.log('query successful');
+            if(rows!=null) {
+                console.log(rows[0]);
+            }
+            else{
+                console.log(rows[0]);
+            }
+            res.send("1");
+        }
+    });
+}
+
+helpers.getDelay = function (docID,patientID,appointmentST,res) {
+    connection.query('call sp_is_data_changed(?,?,?)',[docID,patientID,appointmentST],function (error,rows,fields) {
+        //callback
+        if(!!error){
+            console.log('error from db'+error);
+
+            res.send('-1');
+        }
+        else{
+            // console.log(fields);
+            console.log('query successful');
+            if(rows[0].length!=0) {
+                console.log(rows[0]);
+                res.send(rows[0]);
+            }
+            else{
+                console.log(rows[0]);
+                res.send({});
+            }
+
+        }
+    });
+}
+
 helpers.getDoctorList = function(res){
     connection.query('call sp_get_doctor_list()',function (error,rows) {
         //callback
@@ -86,7 +132,7 @@ helpers.scheduleAppointment =  function(schData,res) {
 }
 
 helpers.getAvailibility = function(docID, res){
-    connection.query('call sp_get_availibility('+docID+')',function (error,rows,fields) {
+    connection.query('call sp_get_availibility('+docID+')',function (error,rows) {
         //callback
         if(!!error){
             console.log('error from db'+error);
@@ -117,46 +163,26 @@ helpers.getCurrentAppointements = function(patientID, res){
         else{
             // console.log(fields);
             console.log('query successful');
-            var date =new Date(rows[0][0].AppointmentEST);
-            rows[0].forEach(function (element) {
-                element.NAME=element.NAME;
-                element.AppointmentEST=element.AppointmentEST.toString();
-                element.AppointmentET=element.AppointmentET.toString();
-                element.AppointmentEST=element.AppointmentEST.substring(0,element.AppointmentEST.lastIndexOf(':'));
-                element.AppointmentET=element.AppointmentET.substring(0,element.AppointmentET.lastIndexOf(':'));
-            });
+            if(rows[0].length!=0) {
+                console.log(rows[0]);
+                var date =new Date(rows[0][0].AppointmentEST);
+                rows[0].forEach(function (element) {
+                    element.NAME=element.NAME;
+                    element.AppointmentEST=element.AppointmentEST.toString();
+                    element.AppointmentET=element.AppointmentET.toString();
+                    element.AppointmentEST=element.AppointmentEST.substring(0,element.AppointmentEST.lastIndexOf(':'));
+                    element.AppointmentET=element.AppointmentET.substring(0,element.AppointmentET.lastIndexOf(':'));
+                });
+                res.send(rows[0]);
+            }
+            else {
+                console.log(rows[0]);
+                res.send([]);
+            }
             //rows[0][0].AppointmentEST=rows[0][0].AppointmentEST.toString();
           //  rows[0][0].AppointmentET=rows[0][0].AppointmentET.toString();
             //moment.tz(rows[0][0].AppointmentEST,EST).format();
-            if(rows!=null) {
-                console.log(rows[0]);
-            }
-            else{
-                console.log(rows[0]);
-            }
-            res.send(rows[0]);
-        }
-    });
-}
 
-helpers.getPastAppointements = function(patientID, res){
-    //what do we want all appointments of the patient or appointments with a particular doctor?
-    connection.query('call sp_get_past_appointments('+patientID+')',function (error,rows,fields) {
-        //callback
-        if(!!error){
-            console.log('error from db'+error);
-            res.send('-1');
-        }
-        else{
-            // console.log(fields);
-            console.log('query successful');
-            if(rows!=null) {
-                console.log(rows[0]);
-            }
-            else{
-                console.log(rows[0]);
-            }
-            res.send(rows[0]);
         }
     });
 }
@@ -181,7 +207,6 @@ helpers.getPrescription=function(patientID,res){
         }
     });
 }
-
 
 helpers.enterDoctorRoom = function(docID,patientID,res){
     connection.query('call sp_patient_entered_doc_room(?,?)',[docID,patientID],function (error,rows,fields) {
@@ -225,7 +250,7 @@ helpers.getPatientDetails = function (patientID, res) {
     });
 }
 
-helpers.savePrescription = function(updPre,res){
+helpers.postMedicinePrescription = function(updPre,res){
     connection.query('call sp_save_prescription(?,?,?)',[updPre.policyno,updPre.med,updPre.exercise],function (error,rows,fields) {
         //callback
         if(!!error){
@@ -254,7 +279,7 @@ helpers.exitDoctorRoom = function (docID,patientID,appointmentST,res) {
         if(!!error){
             console.log('error from db'+error);
 
-            res.send('-1');
+            res.send(''+'-1');
         }
         else{
             // console.log(fields);
@@ -265,8 +290,8 @@ helpers.exitDoctorRoom = function (docID,patientID,appointmentST,res) {
             else{
                 console.log(rows[0]);
             }
-            var respMsg = '{response:1}';
-            res.send(respMsg);
+            //var respMsg = '{response:1}';
+            res.send(''+'1');
         }
     });
 }
@@ -406,47 +431,64 @@ helpers.getExerciseList = function (res) {
     });
 }
 
-helpers.saveMedicinePrescription = function (details,res) {
-    connection.query('call sp_save_medicine_prescription(?,?,?,?)',
-        [details.patientID, details.medicineDetails,details.docID,details.appointmentID],function (error,rows) {
-        //callback
-        if(!!error){
-            console.log('error from db'+error);
-            res.send({response: '-1'});
-        }
-        else{
-            // console.log(fields);
-            console.log('query successful');
-            if(rows!=null) {
-                console.log(rows[0]);
-            }
-            else{
-                console.log(rows[0]);
-            }
-            res.send(rows[0]);
-        }
-    });
-}
 
-helpers.saveExercisePrescription = function (details,res) {
+helpers.postExercisePrescription = function (details,res) {
     connection.query('call sp_save_exercise_prescription(?,?,?,?)',
         [details.patientID, details.docID,details.exercisetype,details.appointmentID],function (error,rows) {
             if(!!error){
-            console.log('error from db'+error);
-            res.send({response: '-1'});
-        }
-        else{
-            // console.log(fields);
-            console.log('query successful');
-            if(rows!=null) {
-                console.log(rows[0]);
+                console.log('error from db'+error);
+                res.send({response: '-1'});
             }
             else{
-                console.log(rows[0]);
+                // console.log(fields);
+                console.log('query successful');
+                if(rows!=null) {
+                    console.log(rows[0]);
+                }
+                else{
+                    console.log(rows[0]);
+                }
+                res.send(rows[0]);
             }
-            res.send(rows[0]);
-        }
-    });
+        });
+}
+helpers.getPatientMedicineHistory = function (patientID,res) {
+    connection.query('call sp_get_patient_medicine_history('+patientID+')', function (error,rows) {
+            if(!!error){
+                console.log('error from db'+error);
+                res.send({response: '-1'});
+            }
+            else{
+                // console.log(fields);
+                console.log('query successful');
+                if(rows!=null) {
+                    console.log(rows[0]);
+                }
+                else{
+                    console.log(rows[0]);
+                }
+                res.send(rows[0]);
+            }
+        });
+}
+helpers.getPatientExerciseHistory = function (patientID,res) {
+    connection.query('call sp_get_patient_exercise_history('+patientID+')', function (error,rows) {
+            if(!!error){
+                console.log('error from db'+error);
+                res.send({response: '-1'});
+            }
+            else{
+                // console.log(fields);
+                console.log('query successful');
+                if(rows!=null) {
+                    console.log(rows[0]);
+                }
+                else{
+                    console.log(rows[0]);
+                }
+                res.send(rows[0]);
+            }
+        });
 }
 
 helpers.postedFromAlexa = function (symptomData,patientID,res) {
@@ -514,5 +556,50 @@ helpers.getAlexaStatus = function(res, param){
         }
     });
 }
+/*helpers.getPastAppointements = function(patientID, res){
+    //what do we want all appointments of the patient or appointments with a particular doctor?
+    connection.query('call sp_get_past_appointments('+patientID+')',function (error,rows,fields) {
+        //callback
+        if(!!error){
+            console.log('error from db'+error);
+            res.send('-1');
+        }
+        else{
+            // console.log(fields);
+            console.log('query successful');
+            if(rows!=null) {
+                console.log(rows[0]);
+            }
+            else{
+                console.log(rows[0]);
+            }
+            res.send(rows[0]);
+        }
+    });
+}
+*/
+/*
+ helpers.saveMedicinePrescription = function (details,res) {
+ connection.query('call sp_save_medicine_prescription(?,?,?,?)',
+ [details.patientID, details.medicineDetails,details.docID,details.appointmentID],function (error,rows) {
+ //callback
+ if(!!error){
+ console.log('error from db'+error);
+ res.send({response: '-1'});
+ }
+ else{
+ // console.log(fields);
+ console.log('query successful');
+ if(rows!=null) {
+ console.log(rows[0]);
+ }
+ else{
+ console.log(rows[0]);
+ }
+ res.send(rows[0]);
+ }
+ });
+ }
+ */
 
 module.exports = helpers;
