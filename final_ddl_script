@@ -1,0 +1,109 @@
+delimiter $$
+
+CREATE TABLE `appointments` (
+  `App_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `AppointmentST` datetime DEFAULT NULL,
+  `AppointmentET` datetime DEFAULT NULL,
+  `AppointmentEST` datetime DEFAULT NULL,
+  PRIMARY KEY (`App_ID`),
+  UNIQUE KEY `App_ID_UNIQUE` (`App_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `doctor` (
+  `Doc_ID` int(11) NOT NULL,
+  `Name` varchar(100) NOT NULL,
+  `Speciality` varchar(100) NOT NULL,
+  `Contact` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`Doc_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `doctor_slot` (
+  `Doc_ID` int(11) NOT NULL,
+  `Slot_ID` int(11) NOT NULL,
+  `IsAvailable` tinyint(4) DEFAULT '1',
+  PRIMARY KEY (`Doc_ID`,`Slot_ID`),
+  KEY `slot_ID_CONSTRAINT` (`Slot_ID`),
+  CONSTRAINT `DOCTOR_SLOT_CONSTRAINT` FOREIGN KEY (`Doc_ID`) REFERENCES `doctor` (`Doc_ID`),
+  CONSTRAINT `slot_ID_CONSTRAINT` FOREIGN KEY (`Slot_ID`) REFERENCES `slots` (`SLOT_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `exercises` (
+  `Exercise_ID` int(11) NOT NULL,
+  `Exercise_Name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Exercise_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `medicines` (
+  `Medicine_ID` int(11) NOT NULL,
+  `Medicine_Name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Medicine_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `patient` (
+  `Patient_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Pname` varchar(255) DEFAULT NULL,
+  `Dateofbirth` date DEFAULT NULL,
+  `Address` varchar(255) DEFAULT NULL,
+  `Policy_No` int(11) NOT NULL,
+  `Fitbit_URL` varchar(255) DEFAULT NULL,
+  `Symptom_URL` varchar(255) DEFAULT NULL,
+  `Phone_No` varchar(45) DEFAULT NULL,
+  `Gender` varchar(10) DEFAULT NULL,
+  `usesAlexa` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`Patient_ID`),
+  UNIQUE KEY `Policy_No` (`Policy_No`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `patient_medical_details` (
+  `Doc_ID` int(11) NOT NULL,
+  `Patient_ID` int(11) NOT NULL,
+  `App_ID` int(11) NOT NULL,
+  `isDataChanged` int(11) NOT NULL DEFAULT '0',
+  `isDeleted` tinyint(4) NOT NULL DEFAULT '0',
+  `Medicine_Details` multilinestring DEFAULT NULL,
+  `Exercise_Details` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Doc_ID`,`App_ID`,`Patient_ID`),
+  UNIQUE KEY `App_ID` (`App_ID`),
+  KEY `Patient_ID_CONSTRAINT` (`Patient_ID`),
+  CONSTRAINT `App_ID_CONSTRAINT` FOREIGN KEY (`App_ID`) REFERENCES `appointments` (`App_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `Doc_ID_CONSTRAINT` FOREIGN KEY (`Doc_ID`) REFERENCES `doctor` (`Doc_ID`),
+  CONSTRAINT `Patient_ID_CONSTRAINT` FOREIGN KEY (`Patient_ID`) REFERENCES `patient` (`Patient_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `slots` (
+  `Slot_ID` int(11) NOT NULL,
+  `ST` time NOT NULL,
+  `ET` time NOT NULL,
+  PRIMARY KEY (`Slot_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+delimiter $$
+
+CREATE TABLE `symp_map` (
+  `Symptom` varchar(255) DEFAULT NULL,
+  `Speciality` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
