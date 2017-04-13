@@ -117,12 +117,31 @@ router.post('/postMedicinePrescription', function (req,res) {
     var data = req.body.data;
     console.log("check in query"+ req+ "object keys "+ Object.keys(req.body)+"  ");
     var data='';
+    var docID=req.body['doctorID'];
+    console.log("docID= "+ docID);
+    var patientID= req.body['patientID'];
+    console.log("patientID "+ patientID);
+    var i=0;
+
     Object.keys(req.body).forEach(function (element) {
-        data.append("( "+element['Medicine Name']+" "+element['Timings']+" ),");
+        if(element.toString()== "doctorID"){
+            docID=req.body[element];
+            console.log("docID= "+ docID);
+        }
+        if(element.toString() == "patientID"){
+            patientID = req.body[element];
+            console.log("patientID "+ patientID);
+        }
+        else {
+            console.log("data Appended");
+            data.append("("+req.body['prescription['+i+'][Medicine Name]']+": "+req.body['prescription['+i+'][Timings]']+"), ");
+            i++;
+        }/*
+    //(Asprin: Afternoon,Morning),(M2: Moringn, ),*/
     });
 
     // doctorID=1 and patient appointmentID= 1
-    db_helper.postMedicinePrescription(data,res);
+    db_helper.postMedicinePrescription(patientID,docID,data,res);
 });
 
 router.post('/postExercisePrescription', function (req,res) {
@@ -169,13 +188,19 @@ router.get('/saveMedicinePrescription',function (req,res) {
 
 router.get('/postExercisePrescription',function (req,res) {
     console.log('enters patients exercise data');
-    db_helper.saveExercisePrescription(req,res);
+    db_helper.postExercisePrescription(req,res);
 });
 
 router.get('/getExerciseList',function (req,res) {
     console.log('enters patients exercise data');
     db_helper.getExerciseList(res);
 });
+
+router.get('/getTodaysAppointmentList',function (req,res) {
+    console.log('GET TODAYS APPOINTMENT data');
+    db_helper.getTodaysAppointmentList(parseInt(req.query.docID),res);
+});
+
 
 router.get('/getMedicineList',function (req,res) {
     console.log('enters patients exercise data');
@@ -197,7 +222,7 @@ router.post('/postedFromAlexa',function (req,res) {
     var symptomsData = Object.keys(sym);
     data = '';
     for(var i=0;i<symptomsData.length;i++)
-        data+= symptomsData[i]+"";
+        data+= symptomsData[i]+",";
 
     console.log("symptoms: "+data+" "+ "patientID: "+ req.body.patientID);
     db_helper.postedFromAlexa(req.body.patientID,data,res);

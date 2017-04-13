@@ -250,8 +250,8 @@ helpers.getPatientDetails = function (patientID, res) {
     });
 }
 
-helpers.postMedicinePrescription = function(updPre,res){
-    connection.query('call sp_save_prescription(?,?,?)',[updPre.policyno,updPre.med,updPre.exercise],function (error,rows,fields) {
+helpers.postMedicinePrescription = function(patientID,docID,data,res){
+    connection.query('call sp_save_medicine_details(?,?,?)',[patientID,docID,data],function (error,rows) {
         //callback
         if(!!error){
             console.log('error from db'+error);
@@ -431,6 +431,25 @@ helpers.getExerciseList = function (res) {
     });
 }
 
+helpers.getTodaysAppointmentList= function (docID, res) {
+    connection.query('call sp_get_todays_appointment_list('+docID+')', function (error,rows) {
+        if(!!error){
+            console.log('error from db'+error);
+            res.send({response: '-1'});
+        }
+        else{
+            // console.log(fields);
+            console.log('query successful');
+            if(rows!=null) {
+                console.log(rows[0]);
+            }
+            else{
+                console.log(rows[0]);
+            }
+            res.send(rows[0]);
+        }
+    });
+}
 
 helpers.postExercisePrescription = function (details,res) {
     connection.query('call sp_save_exercise_prescription(?,?,?,?)',
