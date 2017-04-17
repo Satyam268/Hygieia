@@ -78,7 +78,7 @@ CREATE TABLE `patient_medical_details` (
   `App_ID` int(11) NOT NULL,
   `isDataChanged` int(11) NOT NULL DEFAULT '0',
   `isDeleted` tinyint(4) NOT NULL DEFAULT '0',
-  `Medicine_Details` multilinestring DEFAULT NULL,
+  `Medicine_Details` varchar(1000) DEFAULT NULL,
   `Exercise_Details` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Doc_ID`,`App_ID`,`Patient_ID`),
   UNIQUE KEY `App_ID` (`App_ID`),
